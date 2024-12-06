@@ -38,6 +38,9 @@ function run_terragrunt {
   # terragrunt_log_file can be used later as file with execution output
   terragrunt_log_file=$(mktemp)
 
+  echo "DIR: ${dir}"
+  echo "COMMAND: ${command[@]}"
+
   cd "${dir}"
   terragrunt "${command[@]}" 2>&1 | tee "${terragrunt_log_file}"
   # terragrunt_exit_code can be used later to determine if execution was successful
@@ -110,19 +113,13 @@ function main {
   local -r tg_dir=${INPUT_TG_DIR:-.}
 
   setup_git
-  # fetch the user id and group id under which the github action is running
-  local -r uid=$(stat -c "%u" "/github/workspace")
-  local -r gid=$(stat -c "%g" "/github/workspace")
-  local -r action_user=$(whoami)
-
-  # setup_permissions "${tg_dir}" "${action_user}" "${action_user}"
-  # trap 'setup_permissions $tg_dir $uid $guid' EXIT
   setup_pre_exec
 
   # add auto approve for apply and destroy commands
   local tg_arg_and_commands="${tg_command}"
   export TERRAGRUNT_TFPATH=tofu
 
+  echo "command: $tg_command"
   if [[ "$tg_command" == "apply"* || "$tg_command" == "destroy"* || "$tg_command" == "run-all apply"* || "$tg_command" == "run-all destroy"* ]]; then
     export TERRAGRUNT_NON_INTERACTIVE=true
     export TF_INPUT=false
