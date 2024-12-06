@@ -38,9 +38,6 @@ function run_terragrunt {
   # terragrunt_log_file can be used later as file with execution output
   terragrunt_log_file=$(mktemp)
 
-  echo "DIR: ${dir}"
-  echo "COMMAND: ${command[@]}"
-
   cd "${dir}"
   terragrunt "${command[@]}" 2>&1 | tee "${terragrunt_log_file}"
   # terragrunt_exit_code can be used later to determine if execution was successful
@@ -117,9 +114,9 @@ function main {
 
   # add auto approve for apply and destroy commands
   local tg_arg_and_commands="${tg_command}"
+  log "Using OpenTofu"
   export TERRAGRUNT_TFPATH=tofu
 
-  echo "command: $tg_command"
   if [[ "$tg_command" == "apply"* || "$tg_command" == "destroy"* || "$tg_command" == "run-all apply"* || "$tg_command" == "run-all destroy"* ]]; then
     export TERRAGRUNT_NON_INTERACTIVE=true
     export TF_INPUT=false
@@ -135,6 +132,7 @@ function main {
       fi
     fi
   fi
+  echo "Running with: ${tg_dir}" "${tg_arg_and_commands}"
   run_terragrunt "${tg_dir}" "${tg_arg_and_commands}"
   setup_post_exec
 
