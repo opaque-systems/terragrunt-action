@@ -35,6 +35,10 @@ runs:
       shell: bash
       env:
         GITHUB_ACTION_PATH: ${{ github.action_path }}
+    - name: find tofu
+      shell: bash
+      run: which tofu
+
     - name: terragrunt
       run: main.sh
       shell: bash
